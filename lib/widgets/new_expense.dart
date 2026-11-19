@@ -11,35 +11,63 @@ class NewExpense extends StatefulWidget {
 
 class _NewExpenseState extends State<NewExpense> {
   final _titleController = TextEditingController();
+  final _amountController = TextEditingController();
 
-@override
-void dispose() {
-  super.dispose();
-  _titleController.dispose();
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _amountController.dispose();
+    super.dispose();
+  }
+
+  void _printExpense() {
+    debugPrint('Title: ${_titleController.text}');
+    debugPrint('Amount: ${_amountController.text}');
+  }
+
+  void _closeForm() {
+    Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
-      throw UnimplementedError();
-      // ignore: dead_code
-      return Padding(
-        padding:EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _titleController,
-              decoration: InputDecoration(labelText: "Title"),
-              maxLength: 50,
-              keyboardType: TextInputType.name,
-            ),// AmountText Controller
-            Row(children:[
-              ElevatedButton(onPressed: () {
-                print(_titleController.text);
-              }, 
-              child: Text("Save Expense")),
-            ])
-          ]
-        ),
-      );
+    return SingleChildScrollView(
+      padding: EdgeInsets.fromLTRB(
+        16,
+        16,
+        16,
+        16 + MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: _titleController,
+            decoration: const InputDecoration(labelText: 'Title'),
+            maxLength: 50,
+            keyboardType: TextInputType.name,
+          ),
+          TextField(
+            controller: _amountController,
+            decoration: const InputDecoration(
+              labelText: 'Amount',
+              prefixText: '\$',
+            ),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(onPressed: _closeForm, child: const Text('Close')),
+              ElevatedButton(
+                onPressed: _printExpense,
+                child: const Text('Save Expense'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }

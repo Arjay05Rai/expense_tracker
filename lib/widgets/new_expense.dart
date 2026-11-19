@@ -1,10 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+final formatter = DateFormat.yMd();
 
 class NewExpense extends StatefulWidget {
   const NewExpense({super.key});
-
   @override
-  State<NewExpense> createState() {
+  State<StatefulWidget> createState() {
     return _NewExpenseState();
   }
 }
@@ -12,7 +15,8 @@ class NewExpense extends StatefulWidget {
 class _NewExpenseState extends State<NewExpense> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
-
+  DateTime? _selectedDate;
+  //make an amount controller
   @override
   void dispose() {
     _titleController.dispose();
@@ -20,49 +24,79 @@ class _NewExpenseState extends State<NewExpense> {
     super.dispose();
   }
 
-  void _printExpense() {
-    debugPrint('Title: ${_titleController.text}');
-    debugPrint('Amount: ${_amountController.text}');
-  }
-
-  void _closeForm() {
-    Navigator.of(context).pop();
+  void _presentDatePicker() async {
+    final now = DateTime.now();
+    final firstDate = DateTime(now.year - 1, now.month, now.day);
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: firstDate,
+      lastDate: now,
+    );
+    setState(() {
+      _selectedDate = pickedDate;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(
-        16,
-        16,
-        16,
-        16 + MediaQuery.of(context).viewInsets.bottom,
-      ),
+    return Padding(
+      padding: EdgeInsets.all(16),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
             controller: _titleController,
-            decoration: const InputDecoration(labelText: 'Title'),
             maxLength: 50,
             keyboardType: TextInputType.name,
+            decoration: InputDecoration(label: Text("Title")),
           ),
-          TextField(
-            controller: _amountController,
-            decoration: const InputDecoration(
-              labelText: 'Amount',
-              prefixText: '\$',
-            ),
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          ),
-          const SizedBox(height: 16),
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              TextButton(onPressed: _closeForm, child: const Text('Close')),
+              Expanded(
+                child: TextField(
+                  controller: _amountController,
+                  maxLength: 10,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    prefixText: '\$',
+                    label: Text("Amount"),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text("Selected Date"),
+                    Text(_selectedDate == null ? "No date selected" : formatter.format(_selectedDate!)),
+                    IconButton(
+                      onPressed: () {
+                        _presentDatePicker();
+                      },
+                      icon: const Icon(Icons.calendar_month),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          //Put Amount TextField
+          Row(
+            children: [
               ElevatedButton(
-                onPressed: _printExpense,
-                child: const Text('Save Expense'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text("Cancel"),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  print(_titleController.text);
+                  print(_amountController.text);
+                },
+                child: Text("Save Expense"),
               ),
             ],
           ),

@@ -1,30 +1,39 @@
+//expenses
 import 'package:expense_tracker/widgets/expenses_list.dart';
 import 'package:expense_tracker/models/expense.dart';
 import 'package:expense_tracker/widgets/new_expense.dart';
 import 'package:flutter/material.dart';
 
-class Expenses extends StatefulWidget{
+class Expenses extends StatefulWidget {
   const Expenses({super.key});
-  
+
   @override
   State<Expenses> createState() {
     return _ExpensesState();
   }
 }
 
-class _ExpensesState extends State<Expenses>{
-void _addExpense(Expense expense) {
+class _ExpensesState extends State<Expenses> {
+  void _addExpense(Expense expense) {
     setState(() {
       _registeredExpenses.add(expense);
     });
   }
 
-  void _openAddExpenseOverlay() {
-    showModalBottomSheet(context: context, builder: (ctx) => NewExpense(onAddExpense: _addExpense));
+  void _removeExpense(Expense expense) {
+    setState(() {
+      _registeredExpenses.remove(expense);
+    });
   }
 
+  void _openAddExpenseOverlay() {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => NewExpense(onAddExpense: _addExpense),
+    );
+  }
 
-    final List<Expense> _registeredExpenses = [
+  final List<Expense> _registeredExpenses = [
     Expense(
       title: "Cheeseburger",
       amount: 11.99,
@@ -44,18 +53,24 @@ void _addExpense(Expense expense) {
       category: Category.leisure,
     ),
   ];
+
   @override
   Widget build(BuildContext context) {
-      
-  
     return Scaffold(
       appBar: AppBar(
         title: Text("Expense Tracker"),
-        actions:[IconButton(icon: Icon(Icons.add), onPressed: _openAddExpenseOverlay) ],
+        actions: [
+          IconButton(icon: Icon(Icons.add), onPressed: _openAddExpenseOverlay),
+        ],
       ),
       body: Column(
-        children: [Text("Chart Here..."),
-          Expanded(child: ExpensesList(expenses: _registeredExpenses),
+        children: [
+          Text("Chart Here..."),
+          Expanded(
+            child: ExpensesList(
+              onRemoveExpense: _removeExpense,
+              expenses: _registeredExpenses,
+            ),
           ),
         ],
       ),
